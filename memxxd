@@ -1,0 +1,7 @@
+#!/bin/sh -eu
+self="$(realpath -- "$0" || printf %s "$0")"
+
+offset="$1"
+shift
+
+"$(dirname -- "$self")"/memdump "$offset" | xxd -s "$offset" "$@"

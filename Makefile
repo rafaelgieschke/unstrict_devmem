@@ -1,7 +1,7 @@
 modname = unstrict_devmem
 modsource = unstrict_devmem
 
-all: $(modname).ko
+all: memdump $(modname).ko
 
 KDIR = /lib/modules/$(shell uname -r)/build
 ccflags-y += $(CFLAGS)
