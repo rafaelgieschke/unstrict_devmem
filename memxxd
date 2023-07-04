@@ -1,7 +1,19 @@
 #!/bin/sh -eu
 self="$(realpath -- "$0" || printf %s "$0")"
 
-offset="$1"
-shift
+found=0
+for arg; do
+  shift
+  case "$found,$arg" in
+  0,-*) ;;
+  0,*)
+    offset="$arg"
+    found=1
+    continue
+    ;;
+  *) ;;
+  esac
+  set -- "$@" "$arg"
+done
 
 "$(dirname -- "$self")"/memdump "$offset" | xxd -s "$offset" "$@"
