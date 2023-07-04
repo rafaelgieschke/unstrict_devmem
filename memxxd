@@ -16,4 +16,4 @@ for arg; do
   set -- "$@" "$arg"
 done
 
-"$(dirname -- "$self")"/memdump "$offset" | xxd -s "$offset" "$@"
+"$(dirname -- "$self")"/memdump "$offset" | xxd -o "$offset" "$@"
