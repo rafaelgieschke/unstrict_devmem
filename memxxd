@@ -3,24 +3,47 @@ self="$(realpath -- "$0" || printf %s "$0")"
 
 : "${file:=/dev/mem}"
 
-found=0
+found_file=0 # 0, 1, i(gnore)
 for arg; do
   shift
-  case "$found,$arg" in
+  case "$found_file,$arg" in
+  i,*)
+    found_file=0
+    ;;
+  0,-[cglnosR])
+    found_file=i
+    ;;
   0,-*) ;;
   0,*)
-    offset="$arg"
-    found=1
-    continue
-    ;;
-  1,*)
     file="$arg"
-    found=2
-    continue
+    arg="-"
+    found_file=1
     ;;
   *) ;;
   esac
   set -- "$@" "$arg"
 done
 
-"$(dirname -- "$self")"/memdump "$offset" "$file" | xxd -o "$offset" "$@"
+seek=0
+found_seek=0
+for arg; do
+  shift
+  case "$found_seek,$arg" in
+  0,-s)
+    arg="-o"
+    found_seek=1
+    ;;
+  0,-s*)
+    seek="${arg#-s}"
+    arg="-o$seek"
+    ;;
+  1,*)
+    seek="$arg"
+    found_seek=0
+    ;;
+  *) ;;
+  esac
+  set -- "$@" "$arg"
+done
+
+"$(dirname -- "$self")"/memdump "$seek" "$file" | xxd -o "$seek" "$@"
