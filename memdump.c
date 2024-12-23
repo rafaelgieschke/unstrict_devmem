@@ -5,14 +5,18 @@
 #include <unistd.h>
 
 int main(int argc, char *argv[]) {
-  if (argc != 2) {
-    fprintf(stderr, "%s 0xMemoryLocation\n", argv[0]);
+  if (argc < 2 || argc > 3) {
+    fprintf(stderr, "%s 0xMemoryLocation [/dev/mem]\n", argv[0]);
     return 2;
   }
 
   size_t target = strtoll(argv[1], 0, 0);
 
-  const char file[] = "/dev/mem";
+  const char *file = "/dev/mem";
+  if (argc > 2) {
+    file = argv[2];
+  }
+
   fprintf(stderr, "%s @ 0x%lx:\n", file, target);
 
   size_t MAP_SIZE = sysconf(_SC_PAGE_SIZE);

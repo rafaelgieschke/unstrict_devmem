@@ -1,6 +1,8 @@
 #!/bin/sh -eu
 self="$(realpath -- "$0" || printf %s "$0")"
 
+: "${file:=/dev/mem}"
+
 found=0
 for arg; do
   shift
@@ -11,9 +13,14 @@ for arg; do
     found=1
     continue
     ;;
+  1,*)
+    file="$arg"
+    found=2
+    continue
+    ;;
   *) ;;
   esac
   set -- "$@" "$arg"
 done
 
-"$(dirname -- "$self")"/memdump "$offset" | xxd -o "$offset" "$@"
+"$(dirname -- "$self")"/memdump "$offset" "$file" | xxd -o "$offset" "$@"
