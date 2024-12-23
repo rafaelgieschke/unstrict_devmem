@@ -1,6 +1,8 @@
+#include <errno.h>
 #include <fcntl.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <sys/mman.h>
 #include <unistd.h>
 
@@ -32,7 +34,7 @@ int main(int argc, char *argv[]) {
     size_t map_start = target & ~MAP_MASK;
     char *map = mmap(0, MAP_SIZE, PROT_READ, MAP_SHARED, fd, map_start);
     if (map == MAP_FAILED) {
-      perror("mmap");
+      fprintf(stderr, "mmap@0x%08lx: %s\n", map_start, strerror(errno));
       return 1;
     }
     write(1, map + (target - map_start), MAP_SIZE - (target - map_start));
