@@ -1,0 +1,8 @@
+#!/bin/sh -eu
+
+pos="$(($1))"
+
+while :; do
+  printf "$(printf '\%o' "$(busybox devmem "$pos" 8)")"
+  : "$((pos += 1))"
+done
