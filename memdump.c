@@ -1,5 +1,6 @@
 #include <errno.h>
 #include <fcntl.h>
+#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -26,6 +27,7 @@ int main(int argc, char *argv[]) {
   }
 
   int on_error_resume_next = getenv("force") && *getenv("force");
+  int width = getenv("width") ? strtoll(getenv("width"), 0, 0) : 0;
 
   fprintf(stderr, "%s @ 0x%lx:\n", file, target);
 
@@ -33,6 +35,7 @@ int main(int argc, char *argv[]) {
   unsigned long MAP_MASK = (MAP_SIZE - 1);
   char empty[MAP_SIZE];
   memset(empty, 0, sizeof empty);
+  char buffer[MAP_SIZE];
 
   int fd = open(file, (revert ? O_RDWR : O_RDONLY) | O_SYNC);
   if (fd == -1) {
@@ -73,7 +76,25 @@ int main(int argc, char *argv[]) {
         memset(empty, 0, sizeof empty);
       }
     } else {
-      size_t bytes = write(1, map + (target - map_start), MAP_SIZE - (target - map_start));
+      if (width != 0) {
+        memset(buffer, 0, sizeof buffer);
+        for (size_t i = target - map_start; i < MAP_SIZE; i += width / 8) {
+          switch (width) {
+#define case_width(width)                                                      \
+  case width:                                                                  \
+    *(uint##width##_t *)(buffer + i) = *(volatile uint##width##_t *)(map + i); \
+    break
+            case_width(8);
+            case_width(16);
+            case_width(32);
+            case_width(64);
+            default:
+              return 2;
+          }
+        }
+      }
+      size_t bytes = write(1, (width ? buffer : map) + (target - map_start),
+                           MAP_SIZE - (target - map_start));
       if (bytes == -1) {
         perror("write");
         return 1;
