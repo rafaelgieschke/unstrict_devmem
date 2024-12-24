@@ -46,7 +46,8 @@ int main(int argc, char *argv[]) {
   int last_errno = 0;
   for (;;) {
     size_t map_start = target & ~MAP_MASK;
-    char *map = mmap(0, MAP_SIZE, revert ? PROT_WRITE : PROT_READ, MAP_SHARED, fd, map_start);
+    char *map = mmap(0, MAP_SIZE, revert ? PROT_WRITE : PROT_READ, MAP_SHARED,
+                     fd, map_start);
     if (map == MAP_FAILED) {
       if (errno != last_errno) {
         last_errno = errno;
@@ -63,7 +64,8 @@ int main(int argc, char *argv[]) {
       }
     }
     if (revert) {
-      size_t bytes = read(0, map + (target - map_start), MAP_SIZE - (target - map_start));
+      size_t bytes =
+          read(0, map + (target - map_start), MAP_SIZE - (target - map_start));
       if (bytes == -1) {
         perror("read");
         return 1;
