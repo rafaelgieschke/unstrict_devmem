@@ -18,8 +18,8 @@ clean:
 	make -C $(KDIR) M=$(PWD) clean
 
 insmod: $(modname).ko
-	sudo rmmod $(modname).ko || :
-	sudo insmod $(modname).ko
+	rmmod $(modname).ko || sudo rmmod $(modname).ko || :
+	insmod $(modname).ko || sudo insmod $(modname).ko
 
 rmmod: $(modname).ko
-	sudo rmmod $(modname).ko
+	rmmod $(modname).ko || sudo rmmod $(modname).ko
