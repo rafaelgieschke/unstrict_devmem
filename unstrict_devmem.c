@@ -1,3 +1,4 @@
+#include <linux/init.h>
 #include <linux/kernel.h>
 #include <linux/kprobes.h>
 #include <linux/module.h>
@@ -13,12 +14,14 @@ static struct kretprobe my_kretprobe = {
     .maxactive = 20,
 };
 
-int init_module(void) {
+static int __init init(void) {
   if (register_kretprobe(&my_kretprobe) < 0)
     return -EINVAL;
   return 0;
 }
+module_init(init);
 
-void cleanup_module(void) { unregister_kretprobe(&my_kretprobe); }
+static void __exit cleanup(void) { unregister_kretprobe(&my_kretprobe); }
+module_exit(cleanup);
 
 MODULE_LICENSE("GPL");
