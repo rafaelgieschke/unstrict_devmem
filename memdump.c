@@ -91,6 +91,7 @@ int main(int argc, char *argv[]) {
             case_width(32);
             case_width(64);
             default:
+              fprintf(stderr, "Error: invalid width: %d\n", width);
               return 2;
           }
         }
